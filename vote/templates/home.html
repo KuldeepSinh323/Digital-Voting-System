@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Online Voting System</title>
+    <link rel='stylesheet' href="{{ url_for('static',filename='stylesheets/style.css') }}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="home-page">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/">Online Voting System</a>
+    </nav>
+    <button id="toggleBtn" class="slide-toggle" type="button" onclick="togglePanel()">→</button>
+    <div id="slidePanel" class="slide-panel">
+        <h5>Navigation</h5>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        {% if current_user.is_authenticated %}
+            {% if user_role == 'admin' %}
+                <a href="/results">Current Results</a>
+                <a href="/user-management">User Management</a>
+            {% else %}
+                <a href="/dashboard">Dashboard</a>
+                <a href="/vote">Vote</a>
+                <a href="/results">Current Results</a>
+            {% endif %}
+            <a href="/logout">Logout ({{ current_user.username }})</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </div>
+    <div id="panelOverlay" class="panel-overlay" onclick="closePanel()"></div>
+    <div class="home-background">
+        <div class="container mt-5">
+            <div class="jumbotron bg-white bg-opacity-90 p-5 rounded shadow-lg">
+                <h1 class="display-4">Welcome to Online Voting System</h1>
+                <p class="lead">Participate in secure and transparent online voting.</p>
+                <a class="btn btn-primary btn-lg" href="/register">Get Started</a>
+            </div>
+            <div class="row text-white">
+                <div class="col-md-4 mb-4">
+                    <div class="home-feature p-4 rounded bg-dark bg-opacity-50">
+                        <h3>Secure Voting</h3>
+                        <p>Cast your vote securely with our advanced authentication system.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="home-feature p-4 rounded bg-dark bg-opacity-50">
+                        <h3>Real-time Results</h3>
+                        <p>View live results and updates as votes are counted.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="home-feature p-4 rounded bg-dark bg-opacity-50">
+                        <h3>Admin Control</h3>
+                        <p>Administrators can create and manage voting events.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function togglePanel() {
+            const panel = document.getElementById('slidePanel');
+            const overlay = document.getElementById('panelOverlay');
+            const body = document.body;
+            const btn = document.getElementById('toggleBtn');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('open');
+            body.classList.toggle('panel-open');
+            if (panel.classList.contains('open')) {
+                btn.textContent = '←';
+            } else {
+                btn.textContent = '→';
+            }
+        }
+        function closePanel() {
+            const panel = document.getElementById('slidePanel');
+            const overlay = document.getElementById('panelOverlay');
+            const body = document.body;
+            const btn = document.getElementById('toggleBtn');
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+            body.classList.remove('panel-open');
+            btn.textContent = '→';
+        }
+    </script>
+</body>
+</html>

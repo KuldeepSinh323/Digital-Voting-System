@@ -1,0 +1,7 @@
+Flask
+Redis
+gunicorn
+Flask-Login
+Flask-WTF
+psycopg2-binary
+Flask-SQLAlchemy
