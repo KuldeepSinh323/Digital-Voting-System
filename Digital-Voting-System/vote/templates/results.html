@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Voting Results - Online Voting System</title>
+    <link rel='stylesheet' href="{{ url_for('static',filename='stylesheets/style.css') }}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/">Online Voting System</a>
+    </nav>
+    <button id="toggleBtn" class="slide-toggle" type="button" onclick="togglePanel()">→</button>
+    <div id="slidePanel" class="slide-panel">
+        <h5>Navigation</h5>
+        <a href="/" id="home-link"><i class="fa fa-home"></i> Home</a>
+        <a href="/about"><i class="fa fa-info-circle"></i> About</a>
+        {% if current_user.is_authenticated and user_role == 'admin' %}
+            <a href="/results" class="active"><i class="fa fa-chart-bar"></i> Current Results</a>
+            <a href="/user-management"><i class="fa fa-users-cog"></i> User Management</a>
+            <a href="/voting-creation"><i class="fa fa-plus-circle"></i> Voting Creation</a>
+            <a href="/logout"><i class="fa fa-sign-out-alt"></i> Logout ({{ current_user.username }})</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </div>
+    <div id="panelOverlay" class="panel-overlay" onclick="closePanel()"></div>
+    <div class="container mt-5">
+        <h2>Voting Results</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Bar Chart</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h3>Pie Chart</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Line Chart</h3>
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Voting Details</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Voter ID</th>
+                            <th>Vote</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="voteTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        function togglePanel() {
+            const panel = document.getElementById('slidePanel');
+            const overlay = document.getElementById('panelOverlay');
+            const body = document.body;
+            const btn = document.getElementById('toggleBtn');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('open');
+            body.classList.toggle('panel-open');
+            if (panel.classList.contains('open')) {
+                btn.textContent = '←';
+            } else {
+                btn.textContent = '→';
+            }
+        }
+        function closePanel() {
+            const panel = document.getElementById('slidePanel');
+            const overlay = document.getElementById('panelOverlay');
+            const body = document.body;
+            const btn = document.getElementById('toggleBtn');
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+            body.classList.remove('panel-open');
+            btn.textContent = '→';
+        }
+
+        async function loadResults() {
+            const response = await fetch('/api/results');
+            const data = await response.json();
+            const labels = [data.a_label, data.b_label];
+            const values = [data.a_percent, data.b_percent];
+
+            // Bar Chart
+            new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Votes (%)',
+                        data: values,
+                        backgroundColor: ['#007bff', '#28a745']
+                    }]
+                }
+            });
+
+            // Pie Chart
+            new Chart(document.getElementById('pieChart'), {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#007bff', '#28a745']
+                    }]
+                }
+            });
+
+            // Line Chart (same as bar for now)
+            new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Votes (%)',
+                        data: values,
+                        borderColor: '#007bff',
+                        fill: false
+                    }]
+                }
+            });
+        }
+
+        async function loadVoteDetails() {
+            const response = await fetch('/api/vote_details');
+            const votes = await response.json();
+            const table = document.getElementById('voteTable');
+            votes.forEach(vote => {
+                const row = table.insertRow();
+                row.insertCell(0).textContent = vote.id;
+                row.insertCell(1).textContent = vote.vote;
+                row.insertCell(2).textContent = new Date(vote.timestamp).toLocaleString();
+            });
+        }
+
+        window.onload = function() {
+            loadResults();
+            loadVoteDetails();
+        };
+    </script>
+</body>
+</html>

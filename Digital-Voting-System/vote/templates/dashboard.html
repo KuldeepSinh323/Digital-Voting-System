@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard - Online Voting System</title>
+    <link rel='stylesheet' href="{{ url_for('static',filename='stylesheets/style.css') }}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url('/static/images/realization-live-voting.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/">Online Voting System</a>
+    </nav>
+    <button id="toggleBtn" class="slide-toggle" type="button" onclick="togglePanel()">→</button>
+    <div id="slidePanel" class="slide-panel">
+        <h5>Navigation</h5>
+        <a href="/"><i class="fa fa-home"></i> Home</a>
+        <a href="/about"><i class="fa fa-info-circle"></i> About</a>
+        {% if current_user.is_authenticated %}
+            {% if user_role == 'admin' %}
+                <a href="/results"><i class="fa fa-chart-bar"></i> Current Results</a>
+                <a href="/user-management"><i class="fa fa-users-cog"></i> User Management</a>
+            {% else %}
+                <a href="/dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+                <a href="/vote" class="vote-link"><i class="fa fa-vote-yea"></i> Vote</a>
+            {% endif %}
+            <a href="/logout"><i class="fa fa-sign-out-alt"></i> Logout ({{ current_user.username }})</a>
+        {% else %}
+            <a href="/login"><i class="fa fa-sign-in-alt"></i> Login</a>
+            <a href="/register"><i class="fa fa-user-plus"></i> Register</a>
+        {% endif %}
+    </div>
+    <div id="panelOverlay" class="panel-overlay" onclick="closePanel()"></div>
+    <div class="container mt-5">
+        <h2>Welcome to Online Voting by Kuldeepsinh</h2>
+        <p>We are committed to revolutionizing the democratic process through innovative online voting solutions. Our platform is designed to empower individuals and organizations by providing a secure, accessible, and transparent voting experience.</p>
+        <p>We're delighted to have you join us in shaping the future through the power of your vote. Our online voting platform has been designed to make the voting process convenient, secure, and accessible to all eligible participants. Whether you're casting your vote for local elections, national initiatives, or organizational decisions, your voice matters.</p>
+    </div>
+    <script>
+        function togglePanel() {
+            document.getElementById('slidePanel').classList.toggle('open');
+            document.getElementById('panelOverlay').classList.toggle('open');
+            document.body.classList.toggle('panel-open');
+        }
+        function closePanel() {
+            document.getElementById('slidePanel').classList.remove('open');
+            document.getElementById('panelOverlay').classList.remove('open');
+            document.body.classList.remove('panel-open');
+        }
+    </script>
+</body>
+</html>

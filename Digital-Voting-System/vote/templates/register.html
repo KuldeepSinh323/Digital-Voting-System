@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Register - Online Voting System</title>
+    <link rel='stylesheet' href="{{ url_for('static',filename='stylesheets/style.css') }}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/">Online Voting System</a>
+    </nav>
+    <button id="toggleBtn" class="slide-toggle" type="button" onclick="togglePanel()">→</button>
+    <div id="slidePanel" class="slide-panel">
+        <h5>Navigation</h5>
+        <a href="/"><i class="fa fa-home"></i> Home</a>
+        <a href="/about"><i class="fa fa-info-circle"></i> About</a>
+        {% if current_user.is_authenticated %}
+            {% if current_user.role == 'admin' %}
+                <a href="/results"><i class="fa fa-chart-bar"></i> Current Results</a>
+                <a href="/user-management"><i class="fa fa-users-cog"></i> User Management</a>
+            {% else %}
+                <a href="/dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+                <a href="/vote" class="vote-link"><i class="fa fa-vote-yea"></i> Vote</a>
+            {% endif %}
+            <a href="/logout"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        {% else %}
+            <a href="/login"><i class="fa fa-sign-in-alt"></i> Login</a>
+            <a href="/register"><i class="fa fa-user-plus"></i> Register</a>
+        {% endif %}
+    </div>
+    <div id="panelOverlay" class="panel-overlay" onclick="closePanel()"></div>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Register</div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            <div class="form-group">
+                                {{ form.username.label }}
+                                {{ form.username(class="form-control") }}
+                                {% for error in form.username.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.password.label }}
+                                {{ form.password(class="form-control") }}
+                                {% for error in form.password.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                        <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                <ul class="list-group">
+                                    {% for message in messages %}
+                                        <li class="list-group-item">{{ message }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    <script>
+        function togglePanel() {
+            const panel = document.getElementById('slidePanel');
+            const overlay = document.getElementById('panelOverlay');
+            const body = document.body;
+            const btn = document.getElementById('toggleBtn');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('open');
+            body.classList.toggle('panel-open');
+            if (panel.classList.contains('open')) {
+                btn.textContent = '←';
+            } else {
+                btn.textContent = '→';
+            }
+        }
+        function closePanel() {
+            const panel = document.getElementById('slidePanel');
+            const overlay = document.getElementById('panelOverlay');
+            const body = document.body;
+            const btn = document.getElementById('toggleBtn');
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+            body.classList.remove('panel-open');
+            btn.textContent = '→';
+        }
+    </script></body>
+</html>
